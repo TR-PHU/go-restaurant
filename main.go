@@ -41,7 +41,8 @@ func runService(db *gorm.DB) error {
 		restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))
 		restaurants.GET("/:id", ginrestaurant.GetRestaurant(appCtx))
 		restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
-		restaurants.PATCH("/:id", ginrestaurant.DeleteRestaurant(appCtx))
+		restaurants.PATCH("/:id", ginrestaurant.UpdateRestaurant(appCtx))
+		restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
 	}
 
 	return r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

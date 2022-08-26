@@ -2,13 +2,14 @@ package restaurantmodel
 
 import (
 	"errors"
+	"simple-rest-api/common"
 	"strings"
 )
 
 type Restaurant struct {
-	Id      int    `json:"id" gorm:"column:id;"`
-	Name    string `json:"name" gorm:"column:name;"`
-	Address string `json:"address" gorm:"column:address;"`
+	common.SQLModel `json:",inline"`
+	Name            string `json:"name" gorm:"column:name;"`
+	Address         string `json:"address" gorm:"column:address;"`
 }
 
 func (Restaurant) TableName() string {

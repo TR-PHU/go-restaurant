@@ -2,11 +2,13 @@ package restaurantbiz
 
 import (
 	"context"
+	"errors"
 	"simple-rest-api/modules/restaurant/restaurantmodel"
 )
 
 type UpdateRestaurantStore interface {
-	UpdateDataByCondition(ctx context.Context, conditions map[string]interface{}, data *restaurantmodel.RestaurantUpdate) error
+	FindDataByCondition(ctx context.Context, condition map[string]interface{}, moreKeys ...string) (*restaurantmodel.Restaurant, error)
+	UpdateData(ctx context.Context, id int, data *restaurantmodel.RestaurantUpdate) error
 }
 
 type updateRestaurantBiz struct {
@@ -18,6 +20,17 @@ func NewUpdateRestaurantBiz(store UpdateRestaurantStore) *updateRestaurantBiz {
 }
 
 func (biz *updateRestaurantBiz) UpdateRestaurant(ctx context.Context, id int, data *restaurantmodel.RestaurantUpdate) error {
-	err := biz.store.UpdateDataByCondition(ctx, map[string]interface{}{"id": id}, data)
-	return err
+	oldData, err := biz.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
+	if err != nil {
+		return err
+	}
+
+	if oldData.Status == 0 {
+		return errors.New("data deleted")
+	}
+
+	if err := biz.store.UpdateData(ctx, id, data); err != nil {
+		return err
+	}
+	return nil
 }

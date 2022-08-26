@@ -3,6 +3,7 @@ package ginrestaurant
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"simple-rest-api/common"
 	"simple-rest-api/component"
 	"simple-rest-api/modules/restaurant/restaurantbiz"
 	"simple-rest-api/modules/restaurant/restaurantstore"
@@ -29,8 +30,6 @@ func DeleteRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"Oke": 1,
-		})
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }

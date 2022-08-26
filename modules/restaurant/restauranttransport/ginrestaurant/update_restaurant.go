@@ -3,6 +3,7 @@ package ginrestaurant
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"simple-rest-api/common"
 	"simple-rest-api/component"
 	"simple-rest-api/modules/restaurant/restaurantbiz"
 	"simple-rest-api/modules/restaurant/restaurantmodel"
@@ -12,7 +13,6 @@ import (
 
 func UpdateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data restaurantmodel.RestaurantUpdate
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -21,6 +21,8 @@ func UpdateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			})
 			return
 		}
+
+		var data restaurantmodel.RestaurantUpdate
 
 		if err := c.ShouldBind(&data); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -39,8 +41,6 @@ func UpdateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"Oke": 1,
-		})
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }

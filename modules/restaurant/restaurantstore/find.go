@@ -21,7 +21,7 @@ func (s *sqlStore) FindDataByCondition(ctx context.Context, conditions map[strin
 			return nil, common.RecordNotFound
 		}
 
-		return nil, err
+		return nil, common.ErrDB(err)
 	}
 
 	return &result, nil

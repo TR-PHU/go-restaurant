@@ -15,23 +15,18 @@ func CreateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 		var data restaurantmodel.RestaurantCreate
 
 		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(http.StatusUnauthorized, map[string]interface{}{
-				"error": err.Error(),
-			})
-
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		store := restaurantstore.NewSQLStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewCreateRestaurantBiz(store)
 
 		if err := biz.CreateRestaurant(c.Request.Context(), &data); err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
+		data.Mask(false)
+
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data.FakeId.String()))
 	}
 }

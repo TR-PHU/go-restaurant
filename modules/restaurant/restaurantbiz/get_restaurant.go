@@ -2,7 +2,6 @@ package restaurantbiz
 
 import (
 	"context"
-	"errors"
 	"simple-rest-api/common"
 	"simple-rest-api/modules/restaurant/restaurantmodel"
 )
@@ -27,11 +26,11 @@ func (biz *getRestaurantBiz) GetRestaurant(ctx context.Context, id int) (*restau
 			return nil, common.RecordNotFound
 		}
 
-		return nil, err
+		return nil, common.ErrDB(err)
 	}
 
 	if data.Status == 0 {
-		return nil, errors.New("data deleted")
+		return nil, common.ErrEntityDeleted(restaurantmodel.EntityName, err)
 	}
 	return data, nil
 }

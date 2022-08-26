@@ -6,10 +6,16 @@ import (
 	"strings"
 )
 
+const EntityName = "restaurant"
+
 type Restaurant struct {
 	common.SQLModel `json:",inline"`
 	Name            string `json:"name" gorm:"column:name;"`
 	Address         string `json:"address" gorm:"column:address;"`
+}
+
+func (r *Restaurant) Mask(isAdminOrOwner bool) {
+	r.GenUID(common.DbTypeRestaurant)
 }
 
 func (Restaurant) TableName() string {
@@ -26,21 +32,26 @@ func (RestaurantUpdate) TableName() string {
 }
 
 type RestaurantCreate struct {
-	Id      int    `json:"id" gorm:"column:id;"`
-	Name    string `json:"name" gorm:"column:name;"`
-	Address string `json:"address" gorm:"column:address;"`
+	common.SQLModel `json:",inline"`
+	Id              int    `json:"id" gorm:"column:id;"`
+	Name            string `json:"name" gorm:"column:name;"`
+	Address         string `json:"address" gorm:"column:address;"`
 }
 
 func (RestaurantCreate) TableName() string {
 	return Restaurant{}.TableName()
 }
 
-func (res *RestaurantCreate) Validate() error {
-	res.Name = strings.TrimSpace(res.Name)
+func (data *RestaurantCreate) Validate() error {
+	data.Name = strings.TrimSpace(data.Name)
 
-	if len(res.Name) == 0 {
+	if len(data.Name) == 0 {
 		return errors.New("restaurant name can't be blank")
 	}
 
 	return nil
+}
+
+func (data *RestaurantCreate) Mask(isAdminOrOwner bool) {
+	data.GenUID(common.DbTypeRestaurant)
 }

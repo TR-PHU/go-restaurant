@@ -8,12 +8,24 @@ import (
 	"net/http"
 	"os"
 	"simple-rest-api/component"
+	"simple-rest-api/component/uploadprovider"
 	"simple-rest-api/middleware"
-	"simple-rest-api/modules/restaurant/restauranttransport/ginrestaurant"
+	"simple-rest-api/module/restaurant/transport/ginrestaurant"
+	"simple-rest-api/module/upload/transport/ginupload"
 )
 
 func main() {
 	dsn := os.Getenv("DBConnectionStr")
+
+	s3BucketName := os.Getenv("S3BucketName")
+	s3Region := os.Getenv("S3Region")
+	s3APIKey := os.Getenv("S3APIKey")
+	s3SecretKey := os.Getenv("S3SecretKey")
+	s3Domain := os.Getenv("S3Domain")
+	//secretKey := os.Getenv("SYSTEM_SECRET")
+
+	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -22,32 +34,38 @@ func main() {
 
 	db = db.Debug()
 
-	if err := runService(db); err != nil {
+	if err := runService(db, s3Provider); err != nil {
 		log.Fatalln(err)
 	}
 
 }
-func runService(db *gorm.DB) error {
-	appCtx := component.NewAppContext(db)
+func runService(db *gorm.DB, s3Provider uploadprovider.UploadProvider) error {
+	appCtx := component.NewAppContext(db, s3Provider)
 
 	r := gin.Default()
 	r.Use(middleware.Recover(appCtx))
-
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
-	// CRUD
+	// Set up static file
+	//r.Static("/static", "./static")
 
-	restaurants := r.Group("/restaurants")
+	// CRUD
+	restaurants := r.Group("/restaurant")
 	{
 		restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))
 		restaurants.GET("/:id", ginrestaurant.GetRestaurant(appCtx))
 		restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
 		restaurants.PATCH("/:id", ginrestaurant.UpdateRestaurant(appCtx))
 		restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
+	}
+
+	uploads := r.Group("/upload")
+	{
+		uploads.POST("", ginupload.Upload(appCtx))
 	}
 
 	return r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

@@ -25,7 +25,7 @@ func CreateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			panic(err)
 		}
 
-		data.Mask(false)
+		data.Mask(common.DbTypeRestaurant)
 
 		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data.FakeId.String()))
 	}

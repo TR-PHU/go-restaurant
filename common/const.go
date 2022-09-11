@@ -2,10 +2,22 @@ package common
 
 import "log"
 
+type DbType int
+
 const (
-	DbTypeRestaurant = 1
-	DbTypeUser       = 2
+	DbTypeRestaurant DbType = 1
+	DbTypeUser       DbType = 2
 )
+
+const (
+	CurrentUser = "user"
+)
+
+type Requester interface {
+	GetUserId() int
+	GetEmail() string
+	GetRole() string
+}
 
 func AppRecover() {
 	if err := recover(); err != nil {

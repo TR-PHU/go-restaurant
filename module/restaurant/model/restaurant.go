@@ -22,7 +22,7 @@ type Restaurant struct {
 }
 
 func (r *Restaurant) Mask(isAdminOrOwner bool) {
-	r.GenUID(common.DbTypeRestaurant)
+	r.SQLModel.Mask(common.DbTypeRestaurant)
 }
 
 func (Restaurant) TableName() string {
@@ -60,8 +60,4 @@ func (data *RestaurantCreate) Validate() error {
 	}
 
 	return nil
-}
-
-func (data *RestaurantCreate) Mask(isAdminOrOwner bool) {
-	data.GenUID(common.DbTypeRestaurant)
 }

@@ -10,7 +10,15 @@ type SQLModel struct {
 	UpdatedAt *time.Time `json:"updated_at" gorm:"column:updated_at"`
 }
 
-func (m *SQLModel) GenUID(dbType int) {
-	uid := NewUID(uint32(m.Id), dbType, 1)
-	m.FakeId = &uid
+func (sqlModel *SQLModel) Mask(dbType DbType) {
+	uid := NewUID(uint32(sqlModel.Id), int(dbType), 1)
+	sqlModel.FakeId = &uid
+}
+
+func (sqlModel *SQLModel) PrepareForInsert() {
+	now := time.Now().UTC()
+	sqlModel.Id = 0
+	sqlModel.Status = 1
+	sqlModel.CreatedAt = &now
+	sqlModel.UpdatedAt = &now
 }
